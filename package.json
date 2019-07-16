@@ -16,6 +16,7 @@
     "mysql2": "^1.6.5",
     "popper.js": "^1.15.0",
     "pug": "^2.0.4",
+    "sb-admin-2": "^3.3.8",
     "sequelize": "^5.10.1",
     "serve-favicon": "~2.4.5"
   }
