@@ -14,7 +14,7 @@ router.get('/', function(req, res, next) {
     if(userData){
       res.status(200).json({ success: 1, data: userData.dataValues });
     } else {
-      res.status(200).json({ success: 2, message: 'User not found' });
+      res.status(200).json({ success: 2, message: config.app.msg_usr_not_found });
     }
   })
 

@@ -7,8 +7,55 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var dashboard = require('./routes/dashboard');
+var util = require("./routes/util");
+var cors = require('cors')
+var config = require("./config/config");
 
 var app = express();
+app.use(cors());
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
+
+app.get('/favicon.ico', (req, res) => res.status(204));
+
+app.use(function (req, res, next) {
+  var url = ['/','/ping','/user/login','/favicon.ico'];
+  if(url.indexOf(req.originalUrl)==-1){ // with array
+    // Validating methods
+    // if(req.method=='POST') {
+    //   if(req.body.token==undefined){
+    //     res.status(401).json({ success: false, message: 'Unauthorized' });
+    //   } else {
+    //     util.authCheck(req.headers.token, function(data){
+    //       if(data){
+    //         next();
+    //       } else {
+    //         res.status(401).json({ success: false, message: 'Token expired' });
+    //       }
+    //     });
+    //   }
+    // } else 
+    if (req.method == 'GET' || req.method =='POST') {
+      if(req.headers.token==undefined){
+        res.status(401).json({ success: false, message: config.app.msg_unauthorized });
+      } else {
+        util.authCheck(req.headers.token, function(data){
+          if(data){
+            next();
+          } else {
+            res.status(401).json({ success: false, message: config.app.msg_token_expired });
+          }
+        });
+      }
+    } else {
+      res.status(401).json({ success: false, message: config.app.msg_unauthorized });
+    }
+  } else {
+    // Accessing general url
+    console.log('Accessing general url',req.originalUrl);
+    next();
+  }
+})
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -24,6 +71,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/user', users);
+app.use('/dashboard', dashboard);
 
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 app.use('/sb-admin-2', express.static(__dirname + '/node_modules/sb-admin-2'));
